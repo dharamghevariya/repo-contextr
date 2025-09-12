@@ -1,9 +1,7 @@
-import typer
-
-app = typer.Typer()
-
-def main(name:str):
-    print(f"Hello {name}")
+"""
+Main entry point for contextr CLI tool
+"""
+from src.contextr.cli import app
 
 if __name__ == "__main__":
-    typer.run(main)
+    app()
