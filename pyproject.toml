@@ -1,12 +1,16 @@
 [project]
 name = "contextr"
 version = "0.1.0"
-description = "Add your description here"
+description = "A CLI tool that analyzes git repositories and packages their content for sharing with LLMs"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "typer>=0.17.4",
+    "gitpython>=3.1.0",
 ]
+
+[project.scripts]
+contextr = "contextr.cli:app"
 
 [dependency-groups]
 dev = [
