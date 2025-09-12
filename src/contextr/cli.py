@@ -1,12 +1,16 @@
+from pathlib import Path
 from typing import List, Optional
 
 import typer
+
+from .commands.package import package_repository
 
 app = typer.Typer(
     name="contextr",
     help="Analyze git repositories and package their content for sharing with LLMs",
     add_completion=False
 )
+
 
 @app.command()
 def main(
@@ -33,7 +37,6 @@ def main(
     ),
 ):
     if version:
-        # TODO: version should be dynamic, take from the pyproject.toml
         typer.echo("contextr version 0.1.0")
         raise typer.Exit()
     
@@ -41,7 +44,27 @@ def main(
     if not paths:
         paths = ["."]
     
-    # TODO: impelemnt the program logic
+    try:
+        result = package_repository(paths, include_pattern=include)
+        
+        if output:
+            output_path = Path(output)
+            try:
+                output_path.write_text(result, encoding='utf-8')
+                typer.echo(f"Context packaged and saved to: {output}", err=True)
+            except Exception as write_error:
+                typer.echo(f"Error writing to file: {write_error}", err=True)
+                typer.echo(result)  # Fall back to stdout
+        else:
+            # Write to stdout
+            typer.echo(result)
+            
+    except Exception as e:
+        typer.echo(f"Error: {e}", err=True)
+        import traceback
+        traceback.print_exc()
+        raise typer.Exit(1)
+
 
 if __name__ == "__main__":
     app()
