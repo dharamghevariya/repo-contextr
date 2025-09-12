@@ -5,7 +5,7 @@
 
 A powerful Repository Context Packager CLI tool that analyzes local git repositories and creates comprehensive text files containing repository content optimized for sharing with Large Language Models (LLMs).
 
-## 🎯 Overview
+## Overview
 
 When developers want to get help from ChatGPT, Claude, or other LLMs about their code, they often struggle with how to share their codebase effectively. Common problems include:
 
@@ -16,17 +16,17 @@ When developers want to get help from ChatGPT, Claude, or other LLMs about their
 
 **contextr** solves this by automatically collecting and formatting repository content into a single, well-structured text file that provides rich context to LLMs, enabling them to give much better assistance with your code.
 
-## ✨ Features
+## Features
 
-- **🔗 Git Integration**: Extracts commit SHA, branch, author, and date information
-- **🌳 Project Structure**: Generates a clear directory tree visualization
-- **📦 File Content Packaging**: Includes file contents with syntax highlighting
-- **🔍 Smart File Discovery**: Recursively scans directories with configurable filtering
-- **📏 Large File Handling**: Truncates files larger than 16KB with clear notices
-- **🚫 Binary File Detection**: Automatically skips binary files
-- **⚠️ Error Handling**: Gracefully handles permission errors and provides helpful messages
-- **💾 Flexible Output**: Write to stdout or save to a file
-- **🎯 Pattern Matching**: Include/exclude files using glob patterns
+- **Git Integration**: Extracts commit SHA, branch, author, and date information
+- **Project Structure**: Generates a clear directory tree visualization
+- **File Content Packaging**: Includes file contents with syntax highlighting
+- **Smart File Discovery**: Recursively scans directories with configurable filtering
+- **Large File Handling**: Truncates files larger than 16KB with clear notices
+- **Binary File Detection**: Automatically skips binary files
+- **Error Handling**: Gracefully handles permission errors and provides helpful messages
+- **Flexible Output**: Write to stdout or save to a file
+- **Pattern Matching**: Include/exclude files using glob patterns
 
 ## Installation
 
@@ -168,7 +168,7 @@ Each file's content with:
 
 When you run `contextr . --include "*.py"`, the output looks like this:
 
-```
+````text
 # Repository Context
 
 ## File System Location
@@ -213,13 +213,13 @@ if __name__ == "__main__":
 ## Summary
 - Total files: 2
 - Total lines: 8
-```
+````
 
-## 🔍 What Files Are Included
+## What Files Are Included
 
 The tool includes most text files but automatically excludes:
 
-### 📁 Excluded Directories
+### Excluded Directories
 - `.git`, `.svn`, `.hg` (version control)
 - `__pycache__`, `.pytest_cache` (Python cache)
 - `node_modules`, `.npm` (Node.js)
@@ -227,19 +227,19 @@ The tool includes most text files but automatically excludes:
 - `build`, `dist`, `target` (build directories)
 - `.env`, `venv`, `.venv` (virtual environments)
 
-### 📄 File Handling Rules
+### File Handling Rules
 - **Binary files**: Automatically detected and skipped
 - **Large files**: Files larger than 16KB are truncated with notice
 - **Permission errors**: Skipped with warning message to stderr
 - **Text files**: All readable text files are included by default
 
-### 🎯 Pattern Matching
+### Pattern Matching
 Use the `--include` option to filter files:
 - `--include "*.py"` - Only Python files
 - `--include "*.{js,ts}"` - JavaScript and TypeScript files
 - `--include "*.md"` - Only Markdown files
 
-## ⚠️ Error Handling
+## Error Handling
 
 The tool handles errors gracefully:
 
@@ -252,11 +252,11 @@ The tool handles errors gracefully:
 | **Non-git repositories** | Works fine | Shows "Not a git repository" in output |
 | **Network issues** | Graceful fallback | Git info shows as unavailable |
 
-## 🛠️ Development
+## Development
 
 ### Project Structure
 
-```
+```text
 contextr/
 ├── main.py                    # Entry point script
 ├── pyproject.toml            # Project configuration & dependencies
@@ -275,7 +275,7 @@ contextr/
             └── helpers.py   # Utility functions
 ```
 
-### 🧪 Running Tests
+### Running Tests
 
 ```bash
 # Install development dependencies
@@ -294,7 +294,7 @@ uv run mypy src/
 uv run black src/
 ```
 
-### 🚀 Contributing
+### Contributing
 
 1. **Fork the repository**
 2. **Clone your fork:**
@@ -312,7 +312,7 @@ uv run black src/
    ```
 5. **Submit a pull request**
 
-### 📋 Development Workflow
+### Development Workflow
 
 ```bash
 # 1. Setup development environment
@@ -333,15 +333,15 @@ pipx install -e .
 contextr . -o test-output.txt
 ```
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## 🤔 Why contextr?
+## Why contextr?
 
 The name "contextr" combines "context" + "r" (for repository), representing the tool's purpose of providing rich context about code repositories in a format that's perfect for LLM interactions.
 
-### 💡 Use Cases
+### Use Cases
 
 - **Code Reviews**: Share complete project context with team members
 - **AI Assistance**: Get better help from ChatGPT, Claude, or GitHub Copilot
@@ -349,7 +349,7 @@ The name "contextr" combines "context" + "r" (for repository), representing the 
 - **Onboarding**: Help new team members understand project structure
 - **Debugging**: Share complete context when asking for help
 
-### 🎯 Perfect for LLMs
+### Perfect for LLMs
 
 The output format is specifically designed to work well with Large Language Models:
 - Clear section headers for easy parsing
@@ -360,4 +360,4 @@ The output format is specifically designed to work well with Large Language Mode
 
 ---
 
-**Made with ❤️ for developers who want better AI assistance with their code.**
+**Made with care for developers who want better AI assistance with their code.**
