@@ -2,8 +2,11 @@ from pathlib import Path
 from typing import List, Optional
 
 import typer
+from rich.console import Console
 
 from .commands.package import package_repository
+
+console = Console()
 
 app = typer.Typer(
     name="contextr",
@@ -37,7 +40,7 @@ def main(
     ),
 ):
     if version:
-        typer.echo("contextr version 0.1.0")
+        console.print("contextr version 0.1.0", style="bold green")
         raise typer.Exit()
     
     # Set default path if none provided
@@ -51,16 +54,16 @@ def main(
             output_path = Path(output)
             try:
                 output_path.write_text(result, encoding='utf-8')
-                typer.echo(f"Context packaged and saved to: {output}", err=True)
+                console.print(f"✅ Context packaged and saved to: {output}", style="bold green")
             except Exception as write_error:
-                typer.echo(f"Error writing to file: {write_error}", err=True)
+                console.print(f"❌ Error writing to file: {write_error}", style="bold red")
                 typer.echo(result)  # Fall back to stdout
         else:
             # Write to stdout
             typer.echo(result)
             
     except Exception as e:
-        typer.echo(f"Error: {e}", err=True)
+        console.print(f"❌ Error: {e}", style="bold red")
         import traceback
         traceback.print_exc()
         raise typer.Exit(1)
