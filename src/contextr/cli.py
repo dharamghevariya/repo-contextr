@@ -11,7 +11,8 @@ console = Console()
 app = typer.Typer(
     name="contextr",
     help="Analyze git repositories and package their content for sharing with LLMs",
-    add_completion=False
+    add_completion=False,
+    context_settings={"help_option_names": ["-h", "--help"]}
 )
 
 
