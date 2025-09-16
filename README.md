@@ -1,4 +1,4 @@
-# contextr
+# repo-contextr
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -14,7 +14,7 @@ When developers want to get help from ChatGPT, Claude, or other LLMs about their
 - **Incomplete Picture**: Hard to convey the overall architecture and organization
 - **Manual Work**: Time-consuming to gather and format relevant code
 
-**contextr** solves this by automatically collecting and formatting repository content into a single, well-structured text file that provides rich context to LLMs, enabling them to give much better assistance with your code.
+**repo-contextr** solves this by automatically collecting and formatting repository content into a single, well-structured text file that provides rich context to LLMs, enabling them to give much better assistance with your code.
 
 ## Features
 
@@ -42,8 +42,8 @@ When developers want to get help from ChatGPT, Claude, or other LLMs about their
 # Install pipx if you don't have it
 pip install pipx
 
-# Install contextr globally (when published)
-pipx install contextr
+# Install repo-contextr globally (when published)
+pipx install repo-contextr
 
 # Or install from source
 pipx install git+https://github.com/dharamghevariya/contextr.git
@@ -75,48 +75,48 @@ pip install -e .
 
 ```bash
 # After installing with pipx
-contextr .
+repo-contextr .
 
 # Package a specific directory
-contextr /path/to/your/project
+repo-contextr /path/to/your/project
 
 # Package specific files
-contextr src/main.py src/utils.py
+repo-contextr src/main.py src/utils.py
 
 # Save output to a file
-contextr . -o my-project-context.txt
+repo-contextr . -o my-project-context.txt
 
 # Include only Python files
-contextr . --include "*.py"
+repo-contextr . --include "*.py"
 
 # Include only JavaScript files
-contextr . --include "*.js"
+repo-contextr . --include "*.js"
 ```
 
 ### Using with uv (Development)
 
 ```bash
 # Package the current directory
-uv run contextr .
+uv run repo-contextr .
 
 # Package with filters
-uv run contextr . --include "*.py" -o output.txt
+uv run repo-contextr . --include "*.py" -o output.txt
 ```
 
 ### Using with virtual environment
 
 ```bash
 # After activating your virtual environment
-python -m contextr .
+python -m repo-contextr .
 # Or if installed in the environment
-contextr .
+repo-contextr .
 ```
 
 ### Command Line Options
 
 | Option | Short | Description | Example |
 |--------|-------|-------------|---------|
-| `paths` | - | One or more file or directory paths to analyze | `contextr src/ docs/` |
+| `paths` | - | One or more file or directory paths to analyze | `repo-contextr src/ docs/` |
 | `--output` | `-o` | Output file path (default: stdout) | `-o context.txt` |
 | `--include` | - | Pattern to include files (glob pattern) | `--include "*.py"` |
 | `--version` | `-v` | Show version and exit | `-v` |
@@ -126,16 +126,16 @@ contextr .
 
 ```bash
 # Package only Python and JavaScript files
-contextr . --include "*.{py,js}"
+repo-contextr . --include "*.{py,js}"
 
 # Package a specific subdirectory
-contextr src/ --include "*.py" -o backend-context.txt
+repo-contextr src/ --include "*.py" -o backend-context.txt
 
 # Package multiple specific files
-contextr README.md src/main.py pyproject.toml
+repo-contextr README.md src/main.py pyproject.toml
 
 # Analyze a different repository
-contextr /path/to/other/project -o other-project.txt
+repo-contextr /path/to/other/project -o other-project.txt
 ```
 
 ## Output Format
@@ -166,7 +166,7 @@ Each file's content with:
 
 ## Example Output
 
-When you run `contextr . --include "*.py"`, the output looks like this:
+When you run `repo-contextr . --include "*.py"`, the output looks like this:
 
 ````text
 # Repository Context
@@ -264,7 +264,7 @@ contextr/
 ├── LICENSE                   # MIT License
 ├── uv.lock                   # Dependency lock file
 └── src/
-    └── contextr/
+    └── repo-contextr/
         ├── __init__.py       # Package initialization
         ├── cli.py           # CLI interface using Typer
         ├── commands/
@@ -324,22 +324,22 @@ uv sync
 # Edit files in src/contextr/
 
 # 3. Test your changes
-uv run contextr . --include "*.py"
+uv run repo-contextr . --include "*.py"
 
 # 4. Install in development mode for system-wide testing
 pipx install -e .
 
 # 5. Test the installed version
-contextr . -o test-output.txt
+repo-contextr . -o test-output.txt
 ```
 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Why contextr?
+## Why repo-contextr?
 
-The name "contextr" combines "context" + "r" (for repository), representing the tool's purpose of providing rich context about code repositories in a format that's perfect for LLM interactions.
+The name "repo-contextr" combines "repository" + "context" + "r", representing the tool's purpose of providing rich context about code repositories in a format that's perfect for LLM interactions.
 
 ### Use Cases
 
