@@ -46,7 +46,7 @@ pip install pipx
 pipx install repo-contextr
 
 # Or install from source
-pipx install git+https://github.com/dharamghevariya/contextr.git
+pipx install git+https://github.com/dharamghevariya/repo-contextr.git
 ```
 
 ### For Contributors & Local Development
