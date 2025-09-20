@@ -5,6 +5,7 @@ import os
 import sys
 from pathlib import Path
 from typing import List, Optional, Dict
+from datetime import datetime, timedelta
 
 from ..utils.helpers import (
     discover_files,
@@ -31,7 +32,6 @@ def package_repository(
     Returns:
         Formatted string containing repository context
     """
-    from datetime import datetime, timedelta
 
     # Convert paths to Path objects and resolve them
     resolved_paths = []
