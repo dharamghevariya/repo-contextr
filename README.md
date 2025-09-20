@@ -27,6 +27,8 @@ When developers want to get help from ChatGPT, Claude, or other LLMs about their
 - **Error Handling**: Gracefully handles permission errors and provides helpful messages
 - **Flexible Output**: Write to stdout or save to a file
 - **Pattern Matching**: Include/exclude files using glob patterns
+- **Recent Changes Mode**: Use `--recent` (`-r`) to include only files modified in the last 7 days, with a "Recent Changes" section in the output.
+
 
 ## Installation
 
@@ -121,6 +123,7 @@ repo-contextr .
 | `--include` | - | Pattern to include files (glob pattern) | `--include "*.py"` |
 | `--version` | `-v` | Show version and exit | `-v` |
 | `--help` | `-h` | Show help message | `-h` |
+| `--recent` | `-r` | Include only files modified in the last 7 days | `--recent` |
 
 ### Advanced Examples
 
@@ -136,6 +139,12 @@ repo-contextr README.md src/main.py pyproject.toml
 
 # Analyze a different repository
 repo-contextr /path/to/other/project -o other-project.txt
+
+# Include only files modified in the last 7 days
+uv run main.py --recent
+
+# Combine with include filter (only recent Python files)
+uv run main.py --recent --include "*.py"
 ```
 
 ## Output Format
@@ -160,7 +169,12 @@ Each file's content with:
 - Appropriate syntax highlighting language tags
 - Truncation notices for large files
 
-### 5. Summary Statistics
+### 5. Recent Changes (when --recent is used)
+- Shows only files modified in the last 7 days
+- Includes file contents and statistics for those files
+- Adds a summary line indicating how many recent files were found
+
+### 6. Summary Statistics
 - Total number of files processed
 - Total lines of code
 
@@ -191,28 +205,21 @@ src/
 package.json
 README.md
 
-## File Contents
-
-### File: src/main.py
+## Recent Changes
+### File: main.py
 ```python
-def main():
-    print("Hello, World!")
+Main entry point for contextr CLI tool
+"""
+from src.contextr.cli import app
 
 if __name__ == "__main__":
-    main()
-```
-
-### File: package.json
-```json
-{
-  "name": "my-project",
-  "version": "1.0.0"
-}
+    app()
 ```
 
 ## Summary
 - Total files: 2
 - Total lines: 8
+- Recent files (last 7 days): 1
 ````
 
 ## What Files Are Included
