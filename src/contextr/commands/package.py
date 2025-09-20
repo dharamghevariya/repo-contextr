@@ -93,7 +93,7 @@ def package_repository(
     # Recent Files Section (only include if there are recent files)
     recent_stats = {'total_lines': 0, 'processed_files': 0}
     if recent_files:
-        output_parts.append("## Recent Files\n")
+        output_parts.append("## Recent Changes\n")
         recent_stats = process_files_section(recent_files, repo_root, output_parts)
     
     # File Contents Section (all files if not recent mode, or skip if recent mode)
@@ -110,6 +110,7 @@ def package_repository(
     output_parts.append("## Summary")
     output_parts.append(f"- Total files: {processed_files}")
     output_parts.append(f"- Total lines: {total_lines}")
+    output_parts.append(f"- Recent files (last 7 days): {len(recent_files)}")
     if recent_files and not recent:
         output_parts.append(f"- Recent files (last 7 days): {recent_stats['processed_files']}")
     
