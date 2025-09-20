@@ -4,7 +4,7 @@ Package repository command implementation
 import os
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from ..utils.helpers import (
     discover_files,
@@ -15,17 +15,24 @@ from ..utils.helpers import (
 )
 
 
-def package_repository(paths: List[str], include_pattern: Optional[str] = None) -> str:
+def package_repository(
+        paths: List[str], 
+        include_pattern: Optional[str] = None,
+        recent: bool = False
+    ) -> str:
     """
     Package repository content into a formatted text output.
     
     Args:
         paths: List of file or directory paths to analyze
         include_pattern: Optional pattern to filter files (e.g., '*.py')
+        recent: If True, only include files modified in the last 7 days
         
     Returns:
         Formatted string containing repository context
     """
+    from datetime import datetime, timedelta
+
     # Convert paths to Path objects and resolve them
     resolved_paths = []
     for path_str in paths:
@@ -42,7 +49,17 @@ def package_repository(paths: List[str], include_pattern: Optional[str] = None) 
     repo_root = determine_repo_root(resolved_paths)
     
     # Discover files to include
-    files_to_process = discover_files(resolved_paths, include_pattern)
+    all_files = discover_files(resolved_paths, include_pattern)
+    
+    # Identify recent files (modified in the last 7 days)
+    cutoff_date = datetime.now() - timedelta(days=7)
+    recent_files = [
+        f for f in all_files 
+        if datetime.fromtimestamp(f.stat().st_mtime) >= cutoff_date
+    ]
+    
+    # Determine which files to process based on the recent flag
+    files_to_process = recent_files if recent else all_files
     
     # Get git information - check the actual target directory, not repo_root
     target_path = resolved_paths[0] if len(resolved_paths) == 1 and resolved_paths[0].is_dir() else repo_root
@@ -73,13 +90,48 @@ def package_repository(paths: List[str], include_pattern: Optional[str] = None) 
     structure = generate_tree_structure(files_to_process, repo_root)
     output_parts.append(f"```\n{structure}\n```\n")
     
-    # File Contents
-    output_parts.append("## File Contents\n")
+    # Recent Files Section (only include if there are recent files)
+    recent_stats = {'total_lines': 0, 'processed_files': 0}
+    if recent_files:
+        output_parts.append("## Recent Files\n")
+        recent_stats = process_files_section(recent_files, repo_root, output_parts)
     
+    # File Contents Section (all files if not recent mode, or skip if recent mode)
+    if not recent:
+        output_parts.append("## File Contents\n")
+        all_stats = process_files_section(all_files, repo_root, output_parts)
+        total_lines = all_stats['total_lines']
+        processed_files = all_stats['processed_files']
+    else:
+        total_lines = recent_stats['total_lines']
+        processed_files = recent_stats['processed_files']
+    
+    # Summary
+    output_parts.append("## Summary")
+    output_parts.append(f"- Total files: {processed_files}")
+    output_parts.append(f"- Total lines: {total_lines}")
+    if recent_files and not recent:
+        output_parts.append(f"- Recent files (last 7 days): {recent_stats['processed_files']}")
+    
+    return "\n".join(output_parts)
+
+
+def process_files_section(files_list: List[Path], repo_root: Path, output_parts: List[str]) -> dict:
+    """
+    Process a list of files and add their contents to output_parts.
+    
+    Args:
+        files_list: List of file paths to process
+        repo_root: Repository root path for relative path calculation
+        output_parts: List to append output content to
+        
+    Returns:
+        Dictionary with 'total_lines' and 'processed_files' counts
+    """
     total_lines = 0
     processed_files = 0
     
-    for file_path in sorted(files_to_process):
+    for file_path in sorted(files_list):
         try:
             # Skip binary files
             if is_binary_file(file_path):
@@ -109,12 +161,10 @@ def package_repository(paths: List[str], include_pattern: Optional[str] = None) 
             print(f"Error processing file {file_path}: {e}", file=sys.stderr)
             continue
     
-    # Summary
-    output_parts.append("## Summary")
-    output_parts.append(f"- Total files: {processed_files}")
-    output_parts.append(f"- Total lines: {total_lines}")
-    
-    return "\n".join(output_parts)
+    return {
+        'total_lines': total_lines,
+        'processed_files': processed_files
+    }
 
 
 def determine_repo_root(paths: List[Path]) -> Path:

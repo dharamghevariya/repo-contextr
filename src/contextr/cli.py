@@ -39,6 +39,12 @@ def main(
         "--version",
         help="Show version and exit"
     ),
+    recent: bool = typer.Option(
+        False,
+        "-r",
+        "--recent",
+        help="Only include files modified in the last 7 days"
+    ),
 ):
     if version:
         console.print("contextr version 0.1.0", style="bold green")
@@ -49,7 +55,7 @@ def main(
         paths = ["."]
     
     try:
-        result = package_repository(paths, include_pattern=include)
+        result = package_repository(paths, include_pattern=include, recent=recent)
         
         if output:
             output_path = Path(output)
