@@ -5,14 +5,14 @@ import os
 import sys
 from pathlib import Path
 from typing import List, Optional, Dict
-from datetime import datetime, timedelta
 
 from ..utils.helpers import (
     discover_files,
     generate_tree_structure,
     get_git_info,
     read_file_content,
-    is_binary_file
+    is_binary_file,
+    get_recent_git_files
 )
 
 
@@ -51,19 +51,18 @@ def package_repository(
     # Discover files to include
     all_files = discover_files(resolved_paths, include_pattern)
     
-    # Identify recent files (modified in the last 7 days)
-    cutoff_date = datetime.now() - timedelta(days=7)
-    recent_files = [
-        f for f in all_files 
-        if datetime.fromtimestamp(f.stat().st_mtime) >= cutoff_date
-    ]
-    
-    # Determine which files to process based on the recent flag
-    files_to_process = recent_files if recent else all_files
-    
     # Get git information - check the actual target directory, not repo_root
     target_path = resolved_paths[0] if len(resolved_paths) == 1 and resolved_paths[0].is_dir() else repo_root
     git_info = get_git_info(target_path)
+    
+    # Identify recent files (modified in git commits within the last 7 days)
+    recent_files = get_recent_git_files(target_path, days=7)
+    
+    # Filter recent files to only include those that match our discovery criteria
+    recent_files = [f for f in recent_files if f in all_files]
+    
+    # Determine which files to process based on the recent flag
+    files_to_process = recent_files if recent else all_files
     
     # Generate output
     output_parts = []
@@ -90,21 +89,25 @@ def package_repository(
     structure = generate_tree_structure(files_to_process, repo_root)
     output_parts.append(f"```\n{structure}\n```\n")
     
-    # Recent Files Section (only include if there are recent files)
+    # File Contents or Recent Changes Section
     recent_stats = {'total_lines': 0, 'processed_files': 0}
-    if recent_files:
-        output_parts.append("## Recent Changes\n")
-        recent_stats = process_files_section(recent_files, repo_root, output_parts)
     
-    # File Contents Section (all files if not recent mode, or skip if recent mode)
-    if not recent:
+    if recent:
+        # In recent mode: show only recent files under "File Contents"
+        output_parts.append("## File Contents\n")
+        recent_stats = process_files_section(recent_files, repo_root, output_parts)
+        total_lines = recent_stats['total_lines']
+        processed_files = recent_stats['processed_files']
+    else:
+        # In normal mode: show recent changes first (if any), then all file contents
+        if recent_files and len(recent_files) > 0:
+            output_parts.append("## Recent Changes\n")
+            recent_stats = process_files_section(recent_files, repo_root, output_parts)
+        
         output_parts.append("## File Contents\n")
         all_stats = process_files_section(all_files, repo_root, output_parts)
         total_lines = all_stats['total_lines']
         processed_files = all_stats['processed_files']
-    else:
-        total_lines = recent_stats['total_lines']
-        processed_files = recent_stats['processed_files']
     
     # Summary
     output_parts.append("## Summary")
