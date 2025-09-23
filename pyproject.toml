@@ -10,7 +10,7 @@ dependencies = [
 ]
 
 [project.scripts]
-contextr = "contextr.cli:app"
+contextr = "contextr.main:app"
 
 [tool.setuptools.dynamic]
 version = {attr = "contextr.__version__"}
