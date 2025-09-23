@@ -267,6 +267,85 @@ def is_binary_file(file_path: Path) -> bool:
         return True  # If we can't read it, treat as binary
 
 
+def get_recent_git_files(repo_path: Path, days: int = 7) -> List[Path]:
+    """
+    Get files that have been modified in git commits within the last N days.
+    
+    Args:
+        repo_path: Path to the repository
+        days: Number of days to look back (default: 7)
+        
+    Returns:
+        List of file paths that were modified in recent commits
+    """
+    try:
+        # Find git root
+        current = repo_path.resolve()
+        git_root = None
+        
+        while current != current.parent:
+            git_dir = current / '.git'
+            if git_dir.exists():
+                git_root = current
+                break
+            current = current.parent
+        
+        if git_root is None:
+            return []
+        
+        # Get commits from the last N days
+        since_date = f"{days}.days.ago"
+        
+        def run_git_command(cmd: List[str]) -> str:
+            try:
+                result = subprocess.run(
+                    ['git'] + cmd,
+                    cwd=git_root,
+                    capture_output=True,
+                    text=True,
+                    check=True
+                )
+                return result.stdout.strip()
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                return ""
+        
+        # Get files changed in commits from the last N days
+        # Using --name-only to get just the file names, --since to limit by date
+        changed_files_output = run_git_command([
+            'log', 
+            f'--since={since_date}', 
+            '--name-only', 
+            '--pretty=format:', 
+            '--'
+        ])
+        
+        if not changed_files_output:
+            return []
+        
+        # Parse the output and convert to absolute paths
+        recent_files = []
+        file_lines = [line.strip() for line in changed_files_output.split('\n') if line.strip()]
+        
+        for file_line in file_lines:
+            file_path = git_root / file_line
+            if file_path.exists() and file_path.is_file():
+                recent_files.append(file_path)
+        
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_files = []
+        for file_path in recent_files:
+            if file_path not in seen:
+                seen.add(file_path)
+                unique_files.append(file_path)
+        
+        return unique_files
+        
+    except Exception as e:
+        print(f"Error getting recent git files: {e}", file=sys.stderr)
+        return []
+
+
 def format_file_size(size_bytes: int) -> str:
     """Format file size in human readable format."""
     if size_bytes < 1024:
