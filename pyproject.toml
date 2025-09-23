@@ -1,6 +1,6 @@
 [project]
 name = "repo-contextr"
-version = "0.1.0"
+dynamic = ["version"]
 description = "A CLI tool that analyzes git repositories and packages their content for sharing with LLMs"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -11,6 +11,9 @@ dependencies = [
 
 [project.scripts]
 contextr = "contextr.cli:app"
+
+[tool.setuptools.dynamic]
+version = {attr = "contextr.__version__"}
 
 [dependency-groups]
 dev = [

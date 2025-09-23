@@ -4,6 +4,7 @@ from typing import List, Optional
 import typer
 from rich.console import Console
 
+from . import __version__
 from .commands.package import package_repository
 
 console = Console()
@@ -47,7 +48,7 @@ def main(
     ),
 ):
     if version:
-        console.print("contextr version 0.1.0", style="bold green")
+        console.print(f"contextr version {__version__}", style="bold green")
         raise typer.Exit()
     
     # Set default path if none provided
