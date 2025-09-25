@@ -7,14 +7,7 @@ A powerful Repository Context Packager CLI tool that analyzes local git reposito
 
 ## Overview
 
-When developers want to get help from ChatGPT, Claude, or other LLMs about their code, they often struggle with how to share their codebase effectively. Common problems include:
-
-- **Lost Context**: Copy-pasting individual files loses important project structure and relationships
-- **Missing Dependencies**: LLMs can't see how files connect or what libraries are used
-- **Incomplete Picture**: Hard to convey the overall architecture and organization
-- **Manual Work**: Time-consuming to gather and format relevant code
-
-**repo-contextr** solves this by automatically collecting and formatting repository content into a single, well-structured text file that provides rich context to LLMs, enabling them to give much better assistance with your code.
+When developers want to get help from ChatGPT, Claude, or other LLMs about their code, they often struggle with how to share their codebase effectively. **repo-contextr** solves this by automatically collecting and formatting repository content into a single, well-structured text file that provides rich context to LLMs, enabling them to give much better assistance with your code.
 
 ## Features
 
@@ -22,7 +15,6 @@ When developers want to get help from ChatGPT, Claude, or other LLMs about their
 - **Project Structure**: Generates a clear directory tree visualization
 - **File Content Packaging**: Includes file contents with syntax highlighting
 - **Smart File Discovery**: Recursively scans directories with configurable filtering
-- **Large File Handling**: Truncates files larger than 16KB with clear notices
 - **Binary File Detection**: Automatically skips binary files
 - **Error Handling**: Gracefully handles permission errors and provides helpful messages
 - **Flexible Output**: Write to stdout or save to a file
