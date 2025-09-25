@@ -25,26 +25,14 @@ repo-contextr . -o my-project-context.txt
 
 ## Overview
 
-<<<<<<< Updated upstream
 When developers want to get help from ChatGPT, Claude, or other LLMs about their code, they often struggle with how to share their codebase effectively. **repo-contextr** solves this by automatically collecting and formatting repository content into a single, well-structured text file that provides rich context to LLMs, enabling them to give much better assistance with your code.
-=======
-When working with Large Language Models like ChatGPT or Claude, developers often struggle to share their codebase effectively. Copying individual files loses project structure, while explaining complex architectures manually is time-consuming and error-prone.
-
-**repo-contextr** solves this by automatically packaging your repository into a single, well-structured text file. It captures your project's complete context - including git history, file relationships, and code content in a format optimized for LLM understanding.
->>>>>>> Stashed changes
 
 ## Features
 
 - **Git Integration**: Extracts commit SHA, branch, author, and date information
 - **Project Structure**: Generates a clear directory tree visualization
-<<<<<<< Updated upstream
 - **File Content Packaging**: Includes file contents with syntax highlighting
 - **Smart File Discovery**: Recursively scans directories with configurable filtering
-=======
-- **Smart File Packaging**: Includes file contents with syntax highlighting
-- **Intelligent Discovery**: Recursively scans directories with configurable filtering
-- **Large File Handling**: Truncates files larger than 16KB with clear notices
->>>>>>> Stashed changes
 - **Binary File Detection**: Automatically skips binary files
 - **Recent Changes Mode**: Focus on files modified in the last 7 days
 - **Pattern Matching**: Include/exclude files using glob patterns
