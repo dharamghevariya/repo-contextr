@@ -34,7 +34,8 @@ When developers want to get help from ChatGPT, Claude, or other LLMs about their
 - **File Content Packaging**: Includes file contents with syntax highlighting
 - **Smart File Discovery**: Recursively scans directories with configurable filtering
 - **Binary File Detection**: Automatically skips binary files
-- **Recent Changes Mode**: Focus on files modified in the last 7 days
+- **Recent Changes Mode**: Focus on files modified in the last 7 days with git timestamps
+- **Git Timestamps**: Shows last modified dates for files using git history
 - **Pattern Matching**: Include/exclude files using glob patterns
 - **Error Handling**: Gracefully handles permission errors and provides helpful messages
 - **Flexible Output**: Write to stdout or save to a file
@@ -140,12 +141,12 @@ Directory tree showing the organization of included files
 
 ### 4. File Contents
 Each file's content with:
-- Clear file path headers
+- Clear file path headers with git timestamps (when available)
 - Appropriate syntax highlighting language tags
 - Truncation notices for large files
 
 ### 5. Recent Changes (when --recent is used)
-- Shows only files modified in the last 7 days
+- Shows only files modified in the last 7 days with git timestamps
 - Includes file contents and statistics for those files
 - Adds a summary line indicating how many recent files were found
 
@@ -185,7 +186,7 @@ When you run `repo-contextr . --include "*.py"`, the output looks like this:
 
 ## Recent Changes
 
-### File: src/main.py
+### File: src/main.py (Modified: 2025-09-25 14:30:22)
 ```python
 #!/usr/bin/env python3
 """Main entry point for the application."""
@@ -199,7 +200,7 @@ if __name__ == "__main__":
 
 ## File Contents
 
-### File: src/utils/helpers.py
+### File: src/utils/helpers.py (Modified: 2025-09-24 10:15:33)
 ```python
 """Utility functions for the application."""
 
