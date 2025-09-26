@@ -12,7 +12,8 @@ from ..utils.helpers import (
     get_git_info,
     read_file_content,
     is_binary_file,
-    get_recent_git_files
+    get_recent_git_files,
+    get_file_git_timestamp
 )
 
 
@@ -95,17 +96,17 @@ def package_repository(
     if recent:
         # In recent mode: show only recent files under "File Contents"
         output_parts.append("## File Contents\n")
-        recent_stats = process_files_section(recent_files, repo_root, output_parts)
+        recent_stats = process_files_section(recent_files, repo_root, output_parts, repo_root)
         total_lines = recent_stats['total_lines']
         processed_files = recent_stats['processed_files']
     else:
         # In normal mode: show recent changes first (if any), then all file contents
         if recent_files and len(recent_files) > 0:
             output_parts.append("## Recent Changes\n")
-            recent_stats = process_files_section(recent_files, repo_root, output_parts)
+            recent_stats = process_files_section(recent_files, repo_root, output_parts, repo_root)
         
         output_parts.append("## File Contents\n")
-        all_stats = process_files_section(all_files, repo_root, output_parts)
+        all_stats = process_files_section(all_files, repo_root, output_parts, repo_root)
         total_lines = all_stats['total_lines']
         processed_files = all_stats['processed_files']
     
@@ -120,7 +121,7 @@ def package_repository(
     return "\n".join(output_parts)
 
 
-def process_files_section(files_list: List[Path], repo_root: Path, output_parts: List[str]) -> dict:
+def process_files_section(files_list: List[Path], repo_root: Path, output_parts: List[str], git_repo_root: Path) -> dict:
     """
     Process a list of files and add their contents to output_parts.
     
@@ -128,6 +129,7 @@ def process_files_section(files_list: List[Path], repo_root: Path, output_parts:
         files_list: List of file paths to process
         repo_root: Repository root path for relative path calculation
         output_parts: List to append output content to
+        git_repo_root: Git repository root path for timestamp lookup
         
     Returns:
         Dictionary with 'total_lines' and 'processed_files' counts
@@ -150,10 +152,14 @@ def process_files_section(files_list: List[Path], repo_root: Path, output_parts:
             relative_path = file_path.relative_to(repo_root)
             file_extension = file_path.suffix.lstrip('.')
             
+            # Get git timestamp for the file
+            git_timestamp = get_file_git_timestamp(file_path, git_repo_root)
+            timestamp_str = f" (Modified: {git_timestamp})" if git_timestamp else ""
+            
             # Determine language for syntax highlighting
             language = get_language_for_extension(file_extension)
             
-            output_parts.append(f"### File: {relative_path}")
+            output_parts.append(f"### File: {relative_path}{timestamp_str}")
             output_parts.append(f"```{language}")
             output_parts.append(content)
             output_parts.append("```\n")

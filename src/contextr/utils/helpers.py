@@ -346,6 +346,39 @@ def get_recent_git_files(repo_path: Path, days: int = 7) -> List[Path]:
         return []
 
 
+def get_file_git_timestamp(file_path: Path, repo_root: Path) -> Optional[str]:
+    """
+    Get the last commit timestamp for a specific file from git.
+    
+    Args:
+        file_path: Path to the file
+        repo_root: Root path of the git repository
+        
+    Returns:
+        Formatted timestamp string or None if not available
+    """
+    try:
+        relative_path = file_path.relative_to(repo_root)
+        
+        # Get the last commit date for this specific file
+        result = subprocess.run([
+            'git', 'log', '-1', '--pretty=format:%ci', '--', str(relative_path)
+        ], cwd=repo_root, capture_output=True, text=True, check=True)
+        
+        if result.stdout.strip():
+            # Parse the git timestamp and reformat it
+            # Git timestamp format: 2024-01-15 14:30:22 -0500
+            timestamp_str = result.stdout.strip()
+            # Take only the date and time part (remove timezone)
+            datetime_part = timestamp_str.split(' ')[0:2]
+            return ' '.join(datetime_part)
+        
+        return None
+        
+    except (subprocess.CalledProcessError, FileNotFoundError, ValueError):
+        return None
+
+
 def format_file_size(size_bytes: int) -> str:
     """Format file size in human readable format."""
     if size_bytes < 1024:
