@@ -4,7 +4,7 @@ Package repository command implementation
 import os
 import sys
 from pathlib import Path
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 
 from ..utils.helpers import (
     discover_files,
@@ -115,8 +115,23 @@ def package_repository(
     output_parts.append(f"- Total files: {processed_files}")
     output_parts.append(f"- Total lines: {total_lines}")
     output_parts.append(f"- Recent files (last 7 days): {len(recent_files)}")
-    if recent_files and not recent:
-        output_parts.append(f"- Recent files (last 7 days): {recent_stats['processed_files']}")
+    
+    # Add file type statistics
+    file_types_stats = get_file_types_statistics(files_to_process)
+    if file_types_stats:
+        file_types_str = ", ".join([f".{ext} ({count})" for ext, count in file_types_stats.items()])
+        output_parts.append(f"- File types: {file_types_str}")
+    
+    # Add largest file information
+    largest_file_info = get_largest_file_info(files_to_process)
+    if largest_file_info:
+        relative_path = largest_file_info['path'].relative_to(repo_root)
+        output_parts.append(f"- Largest file: {relative_path} ({largest_file_info['lines']} lines)")
+    
+    # Add average file size
+    if processed_files > 0:
+        avg_size = total_lines // processed_files
+        output_parts.append(f"- Average file size: {avg_size} lines")
     
     return "\n".join(output_parts)
 
@@ -194,6 +209,69 @@ def determine_repo_root(paths: List[Path]) -> Path:
     # Find common parent for multiple paths
     common_parent = Path(os.path.commonpath([str(p) for p in paths]))
     return common_parent
+
+
+def get_file_types_statistics(files: List[Path]) -> Dict[str, int]:
+    """
+    Get statistics about file types (extensions) in the given file list.
+    
+    Args:
+        files: List of file paths to analyze
+        
+    Returns:
+        Dictionary mapping file extensions to their counts, sorted by count (descending)
+    """
+    extension_counts = {}
+    
+    for file_path in files:
+        # Skip binary files for statistics
+        if is_binary_file(file_path):
+            continue
+            
+        # Get extension without the dot, or 'no extension' for files without extension
+        extension = file_path.suffix.lstrip('.') if file_path.suffix else 'no extension'
+        extension_counts[extension] = extension_counts.get(extension, 0) + 1
+    
+    # Sort by count (descending) and return as ordered dict
+    return dict(sorted(extension_counts.items(), key=lambda x: x[1], reverse=True))
+
+
+def get_largest_file_info(files: List[Path]) -> Optional[Dict[str, Any]]:
+    """
+    Get information about the largest file (by line count) in the given file list.
+    
+    Args:
+        files: List of file paths to analyze
+        
+    Returns:
+        Dictionary with 'path' and 'lines' keys, or None if no files processed
+    """
+    largest_file = None
+    max_lines = 0
+    
+    for file_path in files:
+        try:
+            # Skip binary files
+            if is_binary_file(file_path):
+                continue
+            
+            content = read_file_content(file_path)
+            if content is None:
+                continue
+            
+            line_count = len(content.splitlines())
+            
+            if line_count > max_lines:
+                max_lines = line_count
+                largest_file = {
+                    'path': file_path,
+                    'lines': line_count
+                }
+                
+        except Exception:
+            continue
+    
+    return largest_file
 
 
 def get_language_for_extension(extension: str) -> str:
