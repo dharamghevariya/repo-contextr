@@ -3,7 +3,6 @@
 [![PyPI version](https://badge.fury.io/py/repo-contextr.svg)](https://badge.fury.io/py/repo-contextr)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Downloads](https://pepy.tech/badge/repo-contextr)](https://pepy.tech/project/repo-contextr)
 
 A powerful Repository Context Packager CLI tool that analyzes local git repositories and creates comprehensive text files containing repository content optimized for sharing with Large Language Models (LLMs).
 
