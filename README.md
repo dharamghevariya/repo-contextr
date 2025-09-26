@@ -34,7 +34,9 @@ When developers want to get help from ChatGPT, Claude, or other LLMs about their
 - **File Content Packaging**: Includes file contents with syntax highlighting
 - **Smart File Discovery**: Recursively scans directories with configurable filtering
 - **Binary File Detection**: Automatically skips binary files
-- **Recent Changes Mode**: Focus on files modified in the last 7 days
+- **Recent Changes Mode**: Focus on files modified in the last 7 days.
+- **File Type Statistics**: Shows breakdown of file types with counts (e.g., .py (8), .md (3))
+- **Size Analytics**: Displays largest file and average file size information
 - **Pattern Matching**: Include/exclude files using glob patterns
 - **Error Handling**: Gracefully handles permission errors and provides helpful messages
 - **Flexible Output**: Write to stdout or save to a file
@@ -152,7 +154,10 @@ Each file's content with:
 ### 6. Summary Statistics
 - Total number of files processed
 - Total lines of code
-- Recent files count
+- Recent files count (last 7 days)
+- File type breakdown with counts
+- Largest file with line count
+- Average file size in lines
 
 ## Example Output
 
@@ -212,6 +217,9 @@ def format_output(data):
 - Total files: 2
 - Total lines: 12
 - Recent files (last 7 days): 1
+- File types: .py (2)
+- Largest file: src/utils/helpers.py (8 lines)
+- Average file size: 6 lines
 ````
 
 ## What Files Are Included
