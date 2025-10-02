@@ -3,9 +3,19 @@
 [![PyPI version](https://badge.fury.io/py/repo-contextr.svg)](https://badge.fury.io/py/repo-contextr)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Downloads](https://pepy.tech/badge/repo-contextr)](https://pepy.tech/project/repo-contextr)
+[![Contributing](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 A powerful Repository Context Packager CLI tool that analyzes local git repositories and creates comprehensive text files containing repository content optimized for sharing with Large Language Models (LLMs).
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+
+- Setting up the development environment with uv
+- Running tests and code quality checks
+- Submitting pull requests
+- Code style guidelines
+- Project structure and development workflow
 
 ## Quick Start
 
@@ -263,69 +273,7 @@ The tool handles errors gracefully:
 | **Non-git repositories** | Works fine | Shows "Not a git repository" in output |
 | **Network issues** | Graceful fallback | Git info shows as unavailable |
 
-## Contributing
-
-We welcome contributions! Here's how to get started:
-
-### Quick Setup
-
-```bash
-# 1. Fork the repository on GitHub
-# 2. Clone your fork
-git clone https://github.com/yourusername/repo-contextr.git
-cd repo-contextr
-
-# 3. Install in development mode
-pip install -e .
-
-# 4. Make your changes and test
-repo-contextr . --include "*.py"
-
-# 5. Submit a pull request
-```
-
-### Development Workflow
-
-```bash
-# Setup development environment  
-git clone https://github.com/dharamghevariya/repo-contextr.git
-cd repo-contextr
-pip install -e ".[dev]"
-
-# Make changes to src/contextr/
-
-# Test your changes
-repo-contextr . -o test-output.txt
-
-# Run tests (when available)
-pytest
-
-# Format code
-black src/
-
-# Check types
-mypy src/
-```
-
-### Project Structure
-
-```
-repo-contextr/
-├── src/
-│   └── contextr/
-│       ├── __init__.py       # Package initialization
-│       ├── cli.py           # CLI interface using Typer
-│       ├── commands/
-│       │   ├── __init__.py
-│       │   └── package.py   # Main packaging logic
-│       └── utils/
-│           ├── __init__.py
-│           └── helpers.py   # Utility functions
-├── pyproject.toml           # Project configuration
-├── README.md               # This documentation
-├── LICENSE                 # MIT License
-└── tests/                  # Test files (coming soon)
-```
+## Development
 
 ## Use Cases
 
@@ -347,6 +295,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 - **PyPI Package**: https://pypi.org/project/repo-contextr/
 - **GitHub Repository**: https://github.com/dharamghevariya/repo-contextr
 - **Issue Tracker**: https://github.com/dharamghevariya/repo-contextr/issues
+- **Contributing Guide**: [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Documentation**: This README
 
 ---
