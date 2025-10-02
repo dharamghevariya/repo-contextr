@@ -46,6 +46,7 @@ def test_load_toml_config_invalid_syntax():
         with patch('pathlib.Path.cwd', return_value=Path(tmpdir)):
             try:
                 load_toml_config()
+                # typer.Exit(1) is a type of SystemExit 
                 assert False, "Expected SystemExit to be raised"
             except SystemExit:
                 # This is expected behavior
