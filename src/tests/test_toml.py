@@ -1,6 +1,7 @@
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
+import typer
 from contextr.cli import load_toml_config, merge_cli_with_config
 
 
@@ -46,9 +47,8 @@ def test_load_toml_config_invalid_syntax():
         with patch('pathlib.Path.cwd', return_value=Path(tmpdir)):
             try:
                 load_toml_config()
-                # typer.Exit(1) is a type of SystemExit 
-                assert False, "Expected SystemExit to be raised"
-            except SystemExit:
+                assert False, "Expected typer.Exit to be raised"
+            except typer.Exit:
                 # This is expected behavior
                 pass
 
