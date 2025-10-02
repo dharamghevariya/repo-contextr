@@ -124,7 +124,7 @@ def load_toml_config() -> dict:
         - File has invalid TOML syntax
         - Error occurs during file reading
     """
-    config_path = list(Path.cwd().glob("*.contextr.toml"))
+    config_path = list(Path.cwd().glob(".contextr.toml"))
     if not config_path:
         return {}
 
@@ -133,11 +133,11 @@ def load_toml_config() -> dict:
         with open(first_matched_config, "rb") as f:
             return tomllib.load(f)
     except tomllib.TOMLDecodeError:
-        console.print("❌ Invalid toml config, ignored", style="bold yellow")
-        return {}
+        console.print("❌ Invalid toml config", style="bold yellow")
+        raise typer.Exit(1)
     except Exception:
-        console.print("❌ Error loading toml config, ignored", style="bold yellow")
-        return {}
+        console.print("❌ Error loading toml config", style="bold yellow")
+        raise typer.Exit(1)
 
 if __name__ == "__main__":
     app()

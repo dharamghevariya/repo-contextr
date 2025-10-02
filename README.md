@@ -39,6 +39,7 @@ When developers want to get help from ChatGPT, Claude, or other LLMs about their
 - **Size Analytics**: Displays largest file and average file size information
 - **Git Timestamps**: Shows last modified dates for files using git history
 - **Pattern Matching**: Include/exclude files using glob patterns
+- **TOML Config Support**: Set default options via `.contextr.toml` files with CLI override
 - **Error Handling**: Gracefully handles permission errors and provides helpful messages
 - **Flexible Output**: Write to stdout or save to a file
 
@@ -105,6 +106,23 @@ repo-contextr . --recent --include "*.py" -o recent-python.txt
 | `--recent` | `-r` | Only files modified in last 7 days | `--recent` |
 | `--version` | `-v` | Show version and exit | `-v` |
 | `--help` | `-h` | Show help message | `-h` |
+
+### Configuration File Support
+
+**repo-contextr** now supports TOML configuration files for setting default options. Create a `.contextr.toml` file in your project directory:
+
+```toml
+[Flags]
+paths = ["src/", "docs/"]
+include = "*.py"
+output = "project-context.txt"
+recent = false
+```
+
+**Usage notes:**
+- Automatically finds `.contextr.toml` in current directory
+- Command-line arguments always take precedence over config file
+- Supports both single path strings and arrays
 
 ### Real-World Examples
 

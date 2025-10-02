@@ -17,7 +17,7 @@ def test_load_toml_config_valid_file():
     """Test loading a valid TOML config file"""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create a valid TOML file
-        config_path = Path(tmpdir) / "test.contextr.toml"
+        config_path = Path(tmpdir) / ".contextr.toml"
         config_path.write_text("""
 [Flags]
 include = "*.py"
@@ -37,22 +37,26 @@ recent = true
 
 
 def test_load_toml_config_invalid_syntax():
-    """Test that invalid TOML syntax returns empty dict"""
+    """Test that invalid TOML syntax raises SystemExit"""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create invalid TOML file
-        config_path = Path(tmpdir) / "bad.contextr.toml"
+        config_path = Path(tmpdir) / ".contextr.toml"
         config_path.write_text("invalid toml [[[")
 
         with patch('pathlib.Path.cwd', return_value=Path(tmpdir)):
-            config = load_toml_config()
-            assert config == {}
+            try:
+                load_toml_config()
+                assert False, "Expected SystemExit to be raised"
+            except SystemExit:
+                # This is expected behavior
+                pass
 
 
 def test_merge_cli_with_config_cli_takes_precedence():
     """Test that CLI arguments override config values"""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create config file
-        config_path = Path(tmpdir) / "test.contextr.toml"
+        config_path = Path(tmpdir) / ".contextr.toml"
         config_path.write_text("""
 [Flags]
 paths = ["/config/path"]
@@ -81,7 +85,7 @@ def test_merge_cli_with_config_uses_config_defaults():
     """Test that config values are used when CLI args not provided"""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create config file
-        config_path = Path(tmpdir) / "test.contextr.toml"
+        config_path = Path(tmpdir) / ".contextr.toml"
         config_path.write_text("""
 [Flags]
 paths = ["/config/path"]
