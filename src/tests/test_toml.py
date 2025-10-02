@@ -114,7 +114,7 @@ recent = true
 def test_merge_cli_with_config_normalizes_string_path():
     """Test that string paths are normalized to lists"""
     with tempfile.TemporaryDirectory() as tmpdir:
-        config_path = Path(tmpdir) / "test.contextr.toml"
+        config_path = Path(tmpdir) / ".contextr.toml"
         config_path.write_text("""
 [Flags]
 paths = "/single/path"
