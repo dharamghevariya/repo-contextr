@@ -67,6 +67,3 @@ output/
 *.ctx
 logs/
 temp/
-
-# Local toml config
-*.contextr.toml
