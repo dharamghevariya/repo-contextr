@@ -6,6 +6,7 @@ from rich.console import Console
 
 from . import __version__
 from .commands.package import package_repository
+from .config import get_effective_config
 
 console = Console()
 
@@ -51,18 +52,26 @@ def main(
         console.print(f"contextr version {__version__}", style="bold green")
         raise typer.Exit()
     
-    # Set default path if none provided
-    if not paths:
-        paths = ["."]
+    # Get effective configuration by merging TOML config with CLI arguments
+    config = get_effective_config(
+        cli_paths=paths,
+        cli_include=include,
+        cli_output=output,
+        cli_recent=recent
+    )
     
     try:
-        result = package_repository(paths, include_pattern=include, recent=recent)
+        result = package_repository(
+            config.paths, 
+            include_pattern=config.include, 
+            recent=config.recent
+        )
         
-        if output:
-            output_path = Path(output)
+        if config.output:
+            output_path = Path(config.output)
             try:
                 output_path.write_text(result, encoding='utf-8')
-                console.print(f"✅ Context packaged and saved to: {output}", style="bold green")
+                console.print(f"✅ Context packaged and saved to: {config.output}", style="bold green")
             except Exception as write_error:
                 console.print(f"❌ Error writing to file: {write_error}", style="bold red")
                 typer.echo(result)  # Fall back to stdout

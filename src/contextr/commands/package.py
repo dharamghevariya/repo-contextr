@@ -6,15 +6,9 @@ import sys
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 
-from ..utils.helpers import (
-    discover_files,
-    generate_tree_structure,
-    get_git_info,
-    read_file_content,
-    is_binary_file,
-    get_recent_git_files,
-    get_file_git_timestamp
-)
+from ..discovery import discover_files
+from ..git import get_git_info, get_recent_git_files
+from ..formatters import RepositoryReportFormatter
 
 
 def package_repository(
@@ -65,132 +59,16 @@ def package_repository(
     # Determine which files to process based on the recent flag
     files_to_process = recent_files if recent else all_files
     
-    # Generate output
-    output_parts = []
-    
-    # Header
-    output_parts.append("# Repository Context\n")
-    
-    # File System Location
-    output_parts.append("## File System Location\n")
-    output_parts.append(f"{repo_root}\n")
-    
-    # Git Info
-    output_parts.append("## Git Info\n")
-    if git_info:
-        output_parts.append(f"- Commit: {git_info['commit']}")
-        output_parts.append(f"- Branch: {git_info['branch']}")
-        output_parts.append(f"- Author: {git_info['author']}")
-        output_parts.append(f"- Date: {git_info['date']}\n")
-    else:
-        output_parts.append("Not a git repository\n")
-    
-    # Structure
-    output_parts.append("## Structure\n")
-    structure = generate_tree_structure(files_to_process, repo_root)
-    output_parts.append(f"```\n{structure}\n```\n")
-    
-    # File Contents or Recent Changes Section
-    recent_stats = {'total_lines': 0, 'processed_files': 0}
-    
-    if recent:
-        # In recent mode: show only recent files under "File Contents"
-        output_parts.append("## File Contents\n")
-        recent_stats = process_files_section(recent_files, repo_root, output_parts, repo_root)
-        total_lines = recent_stats['total_lines']
-        processed_files = recent_stats['processed_files']
-    else:
-        # In normal mode: show recent changes first (if any), then all file contents
-        if recent_files and len(recent_files) > 0:
-            output_parts.append("## Recent Changes\n")
-            recent_stats = process_files_section(recent_files, repo_root, output_parts, repo_root)
-        
-        output_parts.append("## File Contents\n")
-        all_stats = process_files_section(all_files, repo_root, output_parts, repo_root)
-        total_lines = all_stats['total_lines']
-        processed_files = all_stats['processed_files']
-    
-    # Summary
-    output_parts.append("## Summary")
-    output_parts.append(f"- Total files: {processed_files}")
-    output_parts.append(f"- Total lines: {total_lines}")
-    output_parts.append(f"- Recent files (last 7 days): {len(recent_files)}")
-    
-    # Add file type statistics
-    file_types_stats = get_file_types_statistics(files_to_process)
-    if file_types_stats:
-        file_types_str = ", ".join([f".{ext} ({count})" for ext, count in file_types_stats.items()])
-        output_parts.append(f"- File types: {file_types_str}")
-    
-    # Add largest file information
-    largest_file_info = get_largest_file_info(files_to_process)
-    if largest_file_info:
-        relative_path = largest_file_info['path'].relative_to(repo_root)
-        output_parts.append(f"- Largest file: {relative_path} ({largest_file_info['lines']} lines)")
-    
-    # Add average file size
-    if processed_files > 0:
-        avg_size = total_lines // processed_files
-        output_parts.append(f"- Average file size: {avg_size} lines")
-    
-    return "\n".join(output_parts)
-
-
-def process_files_section(files_list: List[Path], repo_root: Path, output_parts: List[str], git_repo_root: Path) -> dict:
-    """
-    Process a list of files and add their contents to output_parts.
-    
-    Args:
-        files_list: List of file paths to process
-        repo_root: Repository root path for relative path calculation
-        output_parts: List to append output content to
-        git_repo_root: Git repository root path for timestamp lookup
-        
-    Returns:
-        Dictionary with 'total_lines' and 'processed_files' counts
-    """
-    total_lines = 0
-    processed_files = 0
-    
-    for file_path in sorted(files_list):
-        try:
-            # Skip binary files
-            if is_binary_file(file_path):
-                print(f"Skipping binary file: {file_path.relative_to(repo_root)}", file=sys.stderr)
-                continue
-            
-            content = read_file_content(file_path)
-            if content is None:
-                print(f"Skipping file (could not read): {file_path.relative_to(repo_root)}", file=sys.stderr)
-                continue
-            
-            relative_path = file_path.relative_to(repo_root)
-            file_extension = file_path.suffix.lstrip('.')
-            
-            # Get git timestamp for the file
-            git_timestamp = get_file_git_timestamp(file_path, git_repo_root)
-            timestamp_str = f" (Modified: {git_timestamp})" if git_timestamp else ""
-            
-            # Determine language for syntax highlighting
-            language = get_language_for_extension(file_extension)
-            
-            output_parts.append(f"### File: {relative_path}{timestamp_str}")
-            output_parts.append(f"```{language}")
-            output_parts.append(content)
-            output_parts.append("```\n")
-            
-            total_lines += len(content.splitlines())
-            processed_files += 1
-            
-        except Exception as e:
-            print(f"Error processing file {file_path}: {e}", file=sys.stderr)
-            continue
-    
-    return {
-        'total_lines': total_lines,
-        'processed_files': processed_files
-    }
-
+    # Use the formatter to generate the report
+    formatter = RepositoryReportFormatter()
+    return formatter.generate_report(
+        repo_root=repo_root,
+        git_info=git_info,
+        all_files=all_files,
+        recent_files=recent_files,
+        files_to_process=files_to_process,
+        recent_mode=recent
+    )
 
 def determine_repo_root(paths: List[Path]) -> Path:
     """
@@ -209,125 +87,3 @@ def determine_repo_root(paths: List[Path]) -> Path:
     # Find common parent for multiple paths
     common_parent = Path(os.path.commonpath([str(p) for p in paths]))
     return common_parent
-
-
-def get_file_types_statistics(files: List[Path]) -> Dict[str, int]:
-    """
-    Get statistics about file types (extensions) in the given file list.
-    
-    Args:
-        files: List of file paths to analyze
-        
-    Returns:
-        Dictionary mapping file extensions to their counts, sorted by count (descending)
-    """
-    extension_counts = {}
-    
-    for file_path in files:
-        # Skip binary files for statistics
-        if is_binary_file(file_path):
-            continue
-            
-        # Get extension without the dot, or 'no extension' for files without extension
-        extension = file_path.suffix.lstrip('.') if file_path.suffix else 'no extension'
-        extension_counts[extension] = extension_counts.get(extension, 0) + 1
-    
-    # Sort by count (descending) and return as ordered dict
-    return dict(sorted(extension_counts.items(), key=lambda x: x[1], reverse=True))
-
-
-def get_largest_file_info(files: List[Path]) -> Optional[Dict[str, Any]]:
-    """
-    Get information about the largest file (by line count) in the given file list.
-    
-    Args:
-        files: List of file paths to analyze
-        
-    Returns:
-        Dictionary with 'path' and 'lines' keys, or None if no files processed
-    """
-    largest_file = None
-    max_lines = 0
-    
-    for file_path in files:
-        try:
-            # Skip binary files
-            if is_binary_file(file_path):
-                continue
-            
-            content = read_file_content(file_path)
-            if content is None:
-                continue
-            
-            line_count = len(content.splitlines())
-            
-            if line_count > max_lines:
-                max_lines = line_count
-                largest_file = {
-                    'path': file_path,
-                    'lines': line_count
-                }
-                
-        except Exception:
-            continue
-    
-    return largest_file
-
-
-def get_language_for_extension(extension: str) -> str:
-    """Map file extensions to syntax highlighting languages."""
-    language_map = {
-        'py': 'python',
-        'js': 'javascript',
-        'ts': 'typescript',
-        'jsx': 'jsx',
-        'tsx': 'tsx',
-        'java': 'java',
-        'cpp': 'cpp',
-        'c': 'c',
-        'h': 'c',
-        'hpp': 'cpp',
-        'cs': 'csharp',
-        'php': 'php',
-        'rb': 'ruby',
-        'go': 'go',
-        'rs': 'rust',
-        'swift': 'swift',
-        'kt': 'kotlin',
-        'scala': 'scala',
-        'sh': 'bash',
-        'bash': 'bash',
-        'zsh': 'zsh',
-        'fish': 'fish',
-        'ps1': 'powershell',
-        'html': 'html',
-        'htm': 'html',
-        'xml': 'xml',
-        'css': 'css',
-        'scss': 'scss',
-        'sass': 'sass',
-        'less': 'less',
-        'json': 'json',
-        'yaml': 'yaml',
-        'yml': 'yaml',
-        'toml': 'toml',
-        'ini': 'ini',
-        'cfg': 'ini',
-        'conf': 'ini',
-        'md': 'markdown',
-        'markdown': 'markdown',
-        'rst': 'rst',
-        'txt': 'text',
-        'sql': 'sql',
-        'dockerfile': 'dockerfile',
-        'makefile': 'makefile',
-        'r': 'r',
-        'rmd': 'rmarkdown',
-        'tex': 'latex',
-        'vim': 'vim',
-        'lua': 'lua',
-        'pl': 'perl',
-        'pm': 'perl',
-    }
-    
-    return language_map.get(extension.lower(), '')

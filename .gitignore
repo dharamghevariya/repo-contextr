@@ -62,8 +62,7 @@ Thumbs.db
 dmypy.json
 
 # Project specific
-output/
-*.context
+*.contextr.toml
 *.ctx
 logs/
 temp/
