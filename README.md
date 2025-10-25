@@ -41,6 +41,7 @@ When developers want to get help from ChatGPT, Claude, or other LLMs about their
 
 - **Git Integration**: Extracts commit SHA, branch, author, and date information
 - **Project Structure**: Generates a clear directory tree visualization
+- **Token Counting**: Estimate and visualize token distribution across your codebase (NEW!)
 - **File Content Packaging**: Includes file contents with syntax highlighting
 - **Smart File Discovery**: Recursively scans directories with configurable filtering
 - **Binary File Detection**: Automatically skips binary files
@@ -103,6 +104,15 @@ repo-contextr . --recent
 
 # Combine filters
 repo-contextr . --recent --include "*.py" -o recent-python.txt
+
+# Show token counts in structure and summary
+repo-contextr . --token-count-tree -o context-with-tokens.txt
+
+# Filter tree to show only high-token files
+repo-contextr . --token-count-tree --token-threshold 1000
+
+# Just get total token count
+repo-contextr . --tokens
 ```
 
 ### Command Line Options
@@ -113,6 +123,9 @@ repo-contextr . --recent --include "*.py" -o recent-python.txt
 | `--output` | `-o` | Output file path (default: stdout) | `-o context.txt` |
 | `--include` | - | Pattern to include files (glob pattern) | `--include "*.py"` |
 | `--recent` | `-r` | Only files modified in last 7 days | `--recent` |
+| `--token-count-tree` | - | Show token counts in structure | `--token-count-tree` |
+| `--token-threshold` | - | Minimum token count to include | `--token-threshold 1000` |
+| `--tokens` | - | Show estimated total token count | `--tokens` |
 | `--version` | `-v` | Show version and exit | `-v` |
 | `--help` | `-h` | Show help message | `-h` |
 
@@ -133,6 +146,12 @@ repo-contextr . -o full-project.txt
 
 # Focus on backend code only
 repo-contextr backend/ --include "*.{py,sql,yaml}" -o backend-context.txt
+
+# Estimate token usage for LLM context planning
+repo-contextr . --tokens
+
+# Identify token-heavy files for optimization
+repo-contextr . --token-count-tree --token-threshold 500 -o high-token-files.txt
 ```
 
 ## Output Format
@@ -151,6 +170,30 @@ Absolute path to the repository being analyzed
 ### 3. Project Structure
 Directory tree showing the organization of included files
 
+**With Token Counting** (when using `--token-count-tree` or `--tokens`):
+- Shows token estimates for each file and directory
+- Displays total tokens for the entire project
+- Helps identify token-heavy files and directories
+- Supports filtering with `--token-threshold` to focus on high-token files
+
+Example with tokens:
+```
+## Structure
+
+**Total Tokens:** 11,738
+
+```
+contextr/ (11,738 tokens)
+├── commands/ (1,416 tokens)
+│   ├── package.py (726 tokens)
+│   └── token_commands.py (690 tokens)
+├── formatters/ (3,542 tokens)
+│   ├── report_formatter.py (2,157 tokens)
+│   └── token_tree_formatter.py (1,385 tokens)
+└── cli.py (1,068 tokens)
+```
+```
+
 ### 4. File Contents
 Each file's content with:
 - Clear file path headers with git timestamps (when available)
@@ -166,9 +209,82 @@ Each file's content with:
 - Total number of files processed
 - Total lines of code
 - Recent files count (last 7 days)
+- **Estimated tokens** (when token counting is enabled)
 - File type breakdown with counts
 - Largest file with line count
 - Average file size in lines
+
+## Token Counting for LLM Context Optimization
+
+**repo-contextr** includes built-in token estimation to help you optimize content for LLM context windows. This feature uses the industry-standard approximation of ~4 characters per token.
+
+### Why Token Counting Matters
+
+When working with LLMs like ChatGPT, Claude, or other AI assistants, you're limited by context windows (e.g., 8K, 32K, 128K tokens). Understanding your repository's token distribution helps you:
+
+- **Stay within context limits**: Know if your repo fits in the LLM's context window
+- **Optimize file selection**: Identify which files consume the most tokens
+- **Manage API costs**: Estimate token usage for cost planning
+- **Make strategic decisions**: Decide what to include, summarize, or exclude
+
+### Token Counting Options
+
+#### 1. Quick Token Count
+Get just the total estimated tokens:
+```bash
+repo-contextr . --tokens
+# Output: Estimated tokens: 24,515 (across 40 files)
+```
+
+#### 2. Token Distribution Tree
+See token counts for each file and directory in the structure:
+```bash
+repo-contextr . --token-count-tree -o context.txt
+```
+
+This adds token annotations to your regular repository output:
+```
+## Structure
+
+**Total Tokens:** 11,738
+
+```
+src/ (11,738 tokens)
+├── core/ (7,402 tokens)
+│   ├── engine.py (4,250 tokens)
+│   └── utils.py (3,152 tokens)
+└── tests/ (4,336 tokens)
+    └── test_engine.py (4,336 tokens)
+```
+```
+
+#### 3. Filter by Token Threshold
+Focus on token-heavy files only:
+```bash
+repo-contextr . --token-count-tree --token-threshold 1000
+```
+
+This shows only files and directories with ≥1000 tokens, helping you identify optimization targets.
+
+### Use Cases for Token Counting
+
+- **Context Planning**: Determine if your project fits in GPT-4's 128K context
+- **File Prioritization**: Identify which files to include for maximum value
+- **Cost Estimation**: Estimate API costs before processing
+- **Optimization**: Find files that could be summarized or split
+- **Debugging**: Understand why you're hitting context limits
+
+### Token Estimation Accuracy
+
+The tool uses **~4 characters per token**, which is accurate for:
+- English code and comments
+- Common programming languages (Python, JavaScript, Java, etc.)
+- Documentation in English
+
+May be less accurate for:
+- Non-English text
+- Heavily compressed/minified code
+- Special characters and unicode
 
 ## Example Output
 
@@ -228,6 +344,7 @@ def format_output(data):
 - Total files: 2
 - Total lines: 12
 - Recent files (last 7 days): 1
+- Estimated tokens: 3,142
 - File types: .py (2)
 - Largest file: src/utils/helpers.py (8 lines)
 - Average file size: 6 lines
@@ -280,11 +397,13 @@ The tool handles errors gracefully:
 Perfect for these scenarios:
 
 - **AI Assistance**: Get better help from ChatGPT, Claude, or GitHub Copilot
+- **LLM Context Optimization**: Estimate and manage token usage to stay within context limits
 - **Code Reviews**: Share complete project context with team members  
 - **Documentation**: Create comprehensive project snapshots
 - **Onboarding**: Help new team members understand project structure
 - **Debugging**: Share complete context when asking for help
 - **Learning**: Analyze and understand other projects' structure
+- **Cost Management**: Estimate API costs for LLM processing before submission
 
 ## License
 
