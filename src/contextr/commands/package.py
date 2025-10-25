@@ -14,7 +14,9 @@ from ..formatters import RepositoryReportFormatter
 def package_repository(
         paths: List[str], 
         include_pattern: Optional[str] = None,
-        recent: bool = False
+        recent: bool = False,
+        show_tokens: bool = False,
+        token_threshold: int = 0
     ) -> str:
     """
     Package repository content into a formatted text output.
@@ -23,6 +25,8 @@ def package_repository(
         paths: List of file or directory paths to analyze
         include_pattern: Optional pattern to filter files (e.g., '*.py')
         recent: If True, only include files modified in the last 7 days
+        show_tokens: If True, include token counts in the output
+        token_threshold: Minimum token count to include (only used if show_tokens=True)
         
     Returns:
         Formatted string containing repository context
@@ -67,7 +71,9 @@ def package_repository(
         all_files=all_files,
         recent_files=recent_files,
         files_to_process=files_to_process,
-        recent_mode=recent
+        recent_mode=recent,
+        show_tokens=show_tokens,
+        token_threshold=token_threshold
     )
 
 def determine_repo_root(paths: List[Path]) -> Path:
