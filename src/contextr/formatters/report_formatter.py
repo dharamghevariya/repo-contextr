@@ -26,7 +26,9 @@ class RepositoryReportFormatter:
         all_files: List[Path],
         recent_files: List[Path],
         files_to_process: List[Path],
-        recent_mode: bool = False
+        recent_mode: bool = False,
+        show_tokens: bool = False,
+        token_threshold: int = 0
     ) -> str:
         """
         Generate a complete repository report.
@@ -38,6 +40,8 @@ class RepositoryReportFormatter:
             recent_files: Files modified in recent commits
             files_to_process: Files to include in the report
             recent_mode: Whether operating in recent-only mode
+            show_tokens: Whether to show token counts in the tree
+            token_threshold: Minimum token count to include
             
         Returns:
             Formatted report string
@@ -54,7 +58,9 @@ class RepositoryReportFormatter:
         output_parts.append(self._generate_git_section(git_info))
         
         # Structure
-        output_parts.append(self._generate_structure_section(files_to_process, repo_root))
+        output_parts.append(self._generate_structure_section(
+            files_to_process, repo_root, show_tokens, token_threshold
+        ))
         
         # File Contents and Recent Changes
         stats = self._generate_content_sections(
@@ -63,7 +69,7 @@ class RepositoryReportFormatter:
         
         # Summary
         output_parts.append(self._generate_summary_section(
-            stats, recent_files, files_to_process, repo_root
+            stats, recent_files, files_to_process, repo_root, show_tokens
         ))
         
         return "\n".join(output_parts)
@@ -92,10 +98,96 @@ class RepositoryReportFormatter:
         
         return "\n".join(parts)
     
-    def _generate_structure_section(self, files: List[Path], repo_root: Path) -> str:
+    def _generate_structure_section(
+        self, 
+        files: List[Path], 
+        repo_root: Path,
+        show_tokens: bool = False,
+        token_threshold: int = 0
+    ) -> str:
         """Generate the directory structure section."""
-        structure = generate_tree_structure(files, repo_root)
-        return f"## Structure\n\n```\n{structure}\n```\n"
+        if show_tokens:
+            # Import TokenCounter here to avoid circular imports
+            from ..statistics import TokenCounter
+            
+            # Calculate token counts
+            token_counter = TokenCounter()
+            token_data = token_counter.build_token_tree(files, repo_root, token_threshold)
+            
+            # Generate structure with token counts
+            structure = self._generate_tree_with_tokens(token_data['tree'], repo_root)
+            
+            # Add total tokens info
+            total_tokens = token_data['total_tokens']
+            header = f"## Structure\n\n**Total Tokens:** {total_tokens:,}\n"
+            if token_threshold > 0:
+                header += f"**Token Threshold:** {token_threshold:,} (showing only files/dirs above threshold)\n"
+            
+            return f"{header}\n```\n{structure}\n```\n"
+        else:
+            # Regular structure without tokens
+            structure = generate_tree_structure(files, repo_root)
+            return f"## Structure\n\n```\n{structure}\n```\n"
+    
+    def _generate_tree_with_tokens(self, tree: Dict, repo_root: Path, prefix: str = "") -> str:
+        """Generate tree structure with token counts."""
+        lines = []
+        
+        # Add root
+        if not prefix:
+            root_name = repo_root.name or str(repo_root)
+            root_tokens = sum(
+                self._get_node_tokens(node)
+                for node in tree.values()
+            )
+            lines.append(f"{root_name}/ ({root_tokens:,} tokens)")
+        
+        # Sort items: directories first (alphabetically), then files (by token count descending)
+        items = []
+        for key, value in tree.items():
+            if isinstance(value, dict):
+                node_type = value.get('_type', 'unknown')
+                tokens = value.get('_tokens', 0)
+                items.append((key, value, node_type, tokens))
+        
+        items.sort(key=lambda x: (
+            0 if x[2] == 'directory' else 1,  # directories first
+            -x[3] if x[2] == 'file' else x[0].lower()  # files by tokens desc, dirs by name
+        ))
+        
+        for i, (name, node, node_type, tokens) in enumerate(items):
+            is_last_item = (i == len(items) - 1)
+            
+            # Choose the appropriate tree characters
+            connector = "└── " if is_last_item else "├── "
+            extension = "    " if is_last_item else "│   "
+            
+            # Format the line
+            if node_type == 'directory':
+                line = f"{prefix}{connector}{name}/ ({tokens:,} tokens)"
+                lines.append(line)
+                
+                # Recursively format children
+                children = node.get('_children', {})
+                if children:
+                    child_tree = self._generate_tree_with_tokens(
+                        children,
+                        repo_root,
+                        prefix + extension
+                    )
+                    lines.append(child_tree)
+                    
+            elif node_type == 'file':
+                line = f"{prefix}{connector}{name} ({tokens:,} tokens)"
+                lines.append(line)
+        
+        return "\n".join(filter(None, lines))
+    
+    def _get_node_tokens(self, node: Dict) -> int:
+        """Get token count for a node."""
+        if isinstance(node, dict):
+            return node.get('_tokens', 0)
+        return 0
     
     def _generate_content_sections(
         self,
@@ -199,7 +291,8 @@ class RepositoryReportFormatter:
         stats: Dict[str, int],
         recent_files: List[Path],
         files_to_process: List[Path],
-        repo_root: Path
+        repo_root: Path,
+        show_tokens: bool = False
     ) -> str:
         """Generate the summary statistics section."""
         parts = ["## Summary"]
@@ -212,6 +305,14 @@ class RepositoryReportFormatter:
             f"- Total lines: {total_lines}",
             f"- Recent files (last 7 days): {len(recent_files)}"
         ])
+        
+        # Add token count if enabled
+        if show_tokens:
+            from ..statistics import TokenCounter
+            token_counter = TokenCounter()
+            token_counts = token_counter.count_files_tokens(files_to_process)
+            total_tokens = sum(token_counts.values())
+            parts.append(f"- Estimated tokens: {total_tokens:,}")
         
         # Add file type statistics
         file_types_stats = self.stats_calculator.get_file_types_statistics(files_to_process)

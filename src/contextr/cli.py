@@ -47,6 +47,21 @@ def main(
         "--recent",
         help="Only include files modified in the last 7 days"
     ),
+    token_count_tree: bool = typer.Option(
+        False,
+        "--token-count-tree",
+        help="Show token count distribution tree"
+    ),
+    token_threshold: int = typer.Option(
+        0,
+        "--token-threshold",
+        help="Minimum token count to include in tree (use with --token-count-tree)"
+    ),
+    tokens: bool = typer.Option(
+        False,
+        "--tokens",
+        help="Show estimated total token count"
+    ),
 ):
     if version:
         console.print(f"contextr version {__version__}", style="bold green")
@@ -64,7 +79,9 @@ def main(
         result = package_repository(
             config.paths, 
             include_pattern=config.include, 
-            recent=config.recent
+            recent=config.recent,
+            show_tokens=token_count_tree or tokens,
+            token_threshold=token_threshold
         )
         
         if config.output:
