@@ -181,8 +181,6 @@ Example with tokens:
 ## Structure
 
 **Total Tokens:** 11,738
-
-```
 contextr/ (11,738 tokens)
 ├── commands/ (1,416 tokens)
 │   ├── package.py (726 tokens)
@@ -191,7 +189,6 @@ contextr/ (11,738 tokens)
 │   ├── report_formatter.py (2,157 tokens)
 │   └── token_tree_formatter.py (1,385 tokens)
 └── cli.py (1,068 tokens)
-```
 ```
 
 ### 4. File Contents
@@ -248,14 +245,12 @@ This adds token annotations to your regular repository output:
 
 **Total Tokens:** 11,738
 
-```
 src/ (11,738 tokens)
 ├── core/ (7,402 tokens)
 │   ├── engine.py (4,250 tokens)
 │   └── utils.py (3,152 tokens)
 └── tests/ (4,336 tokens)
     └── test_engine.py (4,336 tokens)
-```
 ```
 
 #### 3. Filter by Token Threshold
