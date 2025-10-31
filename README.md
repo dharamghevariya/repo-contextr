@@ -163,7 +163,7 @@ Absolute path to the repository being analyzed
 
 ### 2. Git Information
 - Commit SHA
-- Current branch  
+- Current branch
 - Last commit author
 - Last commit date
 
@@ -351,7 +351,7 @@ The tool includes most text files but automatically excludes:
 
 ### Excluded Directories
 - `.git`, `.svn`, `.hg` (version control)
-- `__pycache__`, `.pytest_cache` (Python cache)  
+- `__pycache__`, `.pytest_cache` (Python cache)
 - `node_modules`, `.npm` (Node.js)
 - `.vscode`, `.idea` (IDE directories)
 - `build`, `dist`, `target` (build directories)
@@ -387,13 +387,40 @@ The tool handles errors gracefully:
 
 ## Development
 
+### Code Formatting and Linting
+
+This project uses [Ruff](https://docs.astral.sh/ruff/) for both code formatting and linting, which provides fast and comprehensive code quality checks.
+
+**Running the formatter manually:**
+```bash
+uv run ruff format .
+```
+
+**Running the linter:**
+```bash
+uv run ruff check .
+```
+
+**Auto-fix linting issues:**
+```bash
+uv run ruff check --fix .
+```
+
+**Pre-commit hooks:**
+The project uses pre-commit hooks that automatically format and check your code before each commit. To install the hooks:
+```bash
+uv run pre-commit install
+```
+
+Once installed, Ruff will automatically format your code and run linting checks whenever you commit changes.
+
 ## Use Cases
 
 Perfect for these scenarios:
 
 - **AI Assistance**: Get better help from ChatGPT, Claude, or GitHub Copilot
 - **LLM Context Optimization**: Estimate and manage token usage to stay within context limits
-- **Code Reviews**: Share complete project context with team members  
+- **Code Reviews**: Share complete project context with team members
 - **Documentation**: Create comprehensive project snapshots
 - **Onboarding**: Help new team members understand project structure
 - **Debugging**: Share complete context when asking for help
