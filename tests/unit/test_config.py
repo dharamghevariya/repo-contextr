@@ -9,14 +9,15 @@ from contextr.config import ContextrConfig, get_effective_config
 
 def test_contextr_config_from_toml_file_not_found():
     """Test that default config is returned when no config file exists"""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        # Mock the cwd function to return the temporary directory
-        with patch("pathlib.Path.cwd", return_value=Path(tmpdir)):
-            config = ContextrConfig.from_toml()
-            assert config.paths == ["."]
-            assert config.include is None
-            assert config.output is None
-            assert config.recent is False
+    with (
+        tempfile.TemporaryDirectory() as tmpdir,
+        patch("pathlib.Path.cwd", return_value=Path(tmpdir)),
+    ):
+        config = ContextrConfig.from_toml()
+        assert config.paths == ["."]
+        assert config.include is None
+        assert config.output is None
+        assert config.recent is False
 
 
 def test_contextr_config_from_toml_valid_file():
@@ -128,13 +129,15 @@ paths = "/single/path"
 
 def test_get_effective_config_default_path():
     """Test that default path ['.'] is used when no paths provided"""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        with patch("pathlib.Path.cwd", return_value=Path(tmpdir)):
-            config = get_effective_config(
-                cli_paths=None, cli_include=None, cli_output=None, cli_recent=False
-            )
+    with (
+        tempfile.TemporaryDirectory() as tmpdir,
+        patch("pathlib.Path.cwd", return_value=Path(tmpdir)),
+    ):
+        config = get_effective_config(
+            cli_paths=None, cli_include=None, cli_output=None, cli_recent=False
+        )
 
-            assert config.paths == ["."]
+        assert config.paths == ["."]
 
 
 def test_contextr_config_from_toml():
