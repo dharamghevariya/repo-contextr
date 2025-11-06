@@ -387,6 +387,51 @@ The tool handles errors gracefully:
 
 ## Development
 
+### Testing
+
+This project uses [pytest](https://docs.pytest.org/) for comprehensive testing with full coverage reporting.
+
+**Running tests:**
+```bash
+# Run all tests
+uv run pytest
+
+# Run with verbose output
+uv run pytest -v
+
+# Run with coverage report
+uv run pytest --cov=src --cov-report=term-missing
+
+# Run specific test file
+uv run pytest tests/unit/test_config.py
+
+# Run tests matching a pattern
+uv run pytest -k "test_git"
+```
+
+**Test structure:**
+```
+tests/
+├── conftest.py           # Shared fixtures (git repos, temp dirs, mock files)
+├── test_smoke.py         # Basic smoke tests
+├── unit/                 # Unit tests for individual modules
+│   └── test_config.py    # Configuration and TOML tests
+├── integration/          # End-to-end workflow tests
+└── fixtures/             # Test data and samples
+```
+
+**Available fixtures:**
+- `temp_dir` - Temporary directory for isolated tests
+- `sample_git_repo` - Initialized git repository with sample files
+- `non_git_dir` - Non-git directory for testing fallback behavior
+- `mock_files_dir` - Directory with various file types (Python, JS, MD, binary)
+- `empty_dir` - Empty directory
+- `recent_files_repo` - Git repo with recent commits for timestamp testing
+- `sample_python_file` - Sample Python file with functions and classes
+
+**Continuous Integration:**
+Tests run automatically on push/PR via GitHub Actions on Ubuntu, Windows, and macOS.
+
 ### Code Formatting and Linting
 
 This project uses [Ruff](https://docs.astral.sh/ruff/) for both code formatting and linting, which provides fast and comprehensive code quality checks.
@@ -413,6 +458,19 @@ uv run pre-commit install
 ```
 
 Once installed, Ruff will automatically format your code and run linting checks whenever you commit changes.
+
+**Running all checks (like CI does):**
+```bash
+# Linting
+uv run ruff check .
+uv run ruff format --check .
+
+# Type checking
+uv run mypy src
+
+# Tests with coverage
+uv run pytest --cov=src --cov-report=term-missing
+```
 
 ## Use Cases
 
