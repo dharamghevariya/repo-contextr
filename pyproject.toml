@@ -84,7 +84,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]  # unused imports OK in __init__.py
-"src/tests/*.py" = ["S101", "SIM117"]  # allow assert in tests, allow nested with
+"tests/**/*.py" = ["S101", "SIM117"]  # allow assert in tests, allow nested with
 
 [tool.ruff.lint.isort]
 known-first-party = ["contextr"]
@@ -126,6 +126,7 @@ addopts = [
 [tool.coverage.run]
 source = ["src"]
 omit = ["*/tests/*", "*/__pycache__/*"]
+branch = true
 
 [tool.coverage.report]
 exclude_lines = [
@@ -136,3 +137,9 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
 ]
+precision = 2
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"

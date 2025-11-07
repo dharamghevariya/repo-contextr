@@ -387,6 +387,114 @@ The tool handles errors gracefully:
 
 ## Development
 
+### Testing
+
+This project uses [pytest](https://docs.pytest.org/) for comprehensive testing with full coverage reporting and detailed code coverage analysis.
+
+**Quick Start:**
+```bash
+# Run all tests
+uv run pytest
+
+# Run with coverage report
+uv run pytest --cov=src --cov-report=term-missing
+
+# Generate interactive HTML coverage report
+uv run pytest --cov=src --cov-report=html
+start htmlcov/index.html
+```
+
+**Advanced Testing Features:**
+
+#### 1. Running Individual Tests
+Run specific tests instead of the entire suite:
+```bash
+# Run a single test function
+uv run pytest tests/unit/test_token_counter.py::TestEstimateTokens::test_estimate_tokens_empty_string -v
+
+# Run all tests in a class
+uv run pytest tests/unit/test_token_counter.py::TestEstimateTokens -v
+
+# Run specific test file
+uv run pytest tests/unit/test_token_counter.py -v
+
+# Run tests matching a pattern
+uv run pytest -k "token" -v
+```
+
+#### 2. Code Coverage Analysis
+Track which code is tested and identify missing test cases:
+```bash
+# Coverage with missing lines highlighted
+uv run pytest --cov=src --cov-report=term-missing
+
+# Generate HTML coverage report (interactive, visual)
+uv run pytest --cov=src --cov-report=html
+start htmlcov/index.html
+
+# Coverage for specific module
+uv run pytest tests/unit/test_token_counter.py --cov=src.contextr.statistics.token_counter --cov-report=term-missing
+```
+
+**Coverage Status:**
+- **file_reader.py**: 96% coverage
+- **file_stats.py**: 94% coverage
+- **token_counter.py**: 95% coverage
+- **Core modules**: 93%+ coverage
+- **Total**: 104 comprehensive tests
+
+**Understanding Coverage Reports:**
+- **Terminal Report**: Shows percentage and missing line numbers
+- **HTML Report**: Interactive, color-coded line-by-line view
+  - 🟢 Green = Covered by tests
+  - 🔴 Red = Not covered (write tests for these!)
+  - ⚪ Gray = Non-executable (comments, blank lines)
+
+#### 3. Debugging Tests
+```bash
+# Show print statements in tests
+uv run pytest -s tests/unit/test_token_counter.py
+
+# Stop on first failure
+uv run pytest -x
+
+# Run only failed tests from last run
+uv run pytest --lf
+
+# Very verbose output
+uv run pytest -vv
+```
+
+**Testing Documentation:**
+- **[TESTING.md](TESTING.md)** - Comprehensive testing guide
+- **[COVERAGE.md](COVERAGE.md)** - Code coverage guide
+
+**Test Structure:**
+```
+tests/
+├── conftest.py              # Shared fixtures (git repos, temp dirs, mock files)
+├── test_smoke.py            # Basic smoke tests
+├── unit/                    # Unit tests for individual modules
+│   ├── test_config.py       # Configuration and TOML tests
+│   ├── test_file_reader.py  # File reading and processing tests
+│   ├── test_file_stats.py   # File statistics tests
+│   └── test_token_counter.py # Token counting tests
+├── integration/             # End-to-end workflow tests
+└── fixtures/                # Test data and samples
+```
+
+**Available Fixtures:**
+- `temp_dir` - Temporary directory for isolated tests
+- `sample_git_repo` - Initialized git repository with sample files
+- `non_git_dir` - Non-git directory for testing fallback behavior
+- `mock_files_dir` - Directory with various file types (Python, JS, MD, binary)
+- `empty_dir` - Empty directory
+- `recent_files_repo` - Git repo with recent commits for timestamp testing
+- `sample_python_file` - Sample Python file with functions and classes
+
+**Continuous Integration:**
+Tests run automatically on push/PR via GitHub Actions on Ubuntu, Windows, and macOS.
+
 ### Code Formatting and Linting
 
 This project uses [Ruff](https://docs.astral.sh/ruff/) for both code formatting and linting, which provides fast and comprehensive code quality checks.
@@ -413,6 +521,19 @@ uv run pre-commit install
 ```
 
 Once installed, Ruff will automatically format your code and run linting checks whenever you commit changes.
+
+**Running all checks (like CI does):**
+```bash
+# Linting
+uv run ruff check .
+uv run ruff format --check .
+
+# Type checking
+uv run mypy src
+
+# Tests with coverage
+uv run pytest --cov=src --cov-report=term-missing
+```
 
 ## Use Cases
 
