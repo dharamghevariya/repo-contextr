@@ -126,6 +126,7 @@ addopts = [
 [tool.coverage.run]
 source = ["src"]
 omit = ["*/tests/*", "*/__pycache__/*"]
+branch = true
 
 [tool.coverage.report]
 exclude_lines = [
@@ -136,3 +137,9 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
 ]
+precision = 2
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"
