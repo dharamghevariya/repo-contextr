@@ -3,6 +3,7 @@ Tree structure formatting functionality.
 """
 
 from pathlib import Path
+from typing import Any
 
 
 def generate_tree_structure(files: list[Path], root: Path) -> str:
@@ -16,14 +17,14 @@ def generate_tree_structure(files: list[Path], root: Path) -> str:
     Returns:
         String representation of the directory tree
     """
-    tree: dict[str, dict | None] = {}
+    tree: dict[str, Any] = {}
 
     for file_path in files:
         try:
             relative_path = file_path.relative_to(root)
             parts = relative_path.parts
 
-            current = tree
+            current: dict[str, Any] = tree
             for part in parts[:-1]:  # All except the file name
                 if part not in current:
                     current[part] = {}
