@@ -195,7 +195,8 @@ class RepositoryReportFormatter:
     def _get_node_tokens(self, node: dict) -> int:
         """Get token count for a node."""
         if isinstance(node, dict):
-            return node.get("_tokens", 0)
+            tokens: int = node.get("_tokens", 0)
+            return tokens
         return 0
 
     def _generate_content_sections(

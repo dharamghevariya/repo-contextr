@@ -16,7 +16,7 @@ def generate_tree_structure(files: list[Path], root: Path) -> str:
     Returns:
         String representation of the directory tree
     """
-    tree = {}
+    tree: dict[str, dict | None] = {}
 
     for file_path in files:
         try:

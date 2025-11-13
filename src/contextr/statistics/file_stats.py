@@ -25,7 +25,7 @@ class FileStatistics:
         Returns:
             Dictionary mapping file extensions to their counts, sorted by count (descending)
         """
-        extension_counts = {}
+        extension_counts: dict[str, int] = {}
 
         for file_path in files:
             # Skip binary files for statistics

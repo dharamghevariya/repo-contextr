@@ -110,7 +110,7 @@ class TokenCounter:
             }
 
         # Build the tree structure
-        tree = {}
+        tree: dict[str, dict] = {}
         total_tokens = 0
 
         for file_path, token_count in token_counts.items():

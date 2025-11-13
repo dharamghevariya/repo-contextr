@@ -143,7 +143,8 @@ class TokenTreeFormatter:
             Token count for this node
         """
         if isinstance(node, dict):
-            return node.get("_tokens", 0)
+            tokens: int = node.get("_tokens", 0)
+            return tokens
         return 0
 
     def format_summary(self, tree_data: dict) -> str:
