@@ -7,7 +7,7 @@ class TestGenerateTreeStructure:
     def test_basic_structures(self, temp_dir):
         """Test basic tree structures: single file, directory, and multiple files."""
         # Single file
-        file1 = temp_dir / "test.py"
+        file1 = temp_dir / "test3.py"
         file1.write_text("content", encoding="utf-8")
         result = generate_tree_structure([file1], temp_dir)
         assert isinstance(result, str)
