@@ -27,8 +27,13 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --editable .
         pip install "ruff>=0.8.0" "mypy>=1.17.1" "pytest>=8.4.2" "pytest-cov>=6.0.0"
+        pip install --editable .
+
+    - name: Verify installation
+      run: |
+        python -c "import contextr; print('Package imported successfully')"
+        python -c "from contextr.cli import app; print('CLI imported successfully')"
 
     - name: Run ruff linting
       run: |
