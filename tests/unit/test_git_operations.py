@@ -1,14 +1,3 @@
-"""
-Unit tests for git operations module.
-
-Tests cover:
-- Git root discovery
-- Git information extraction
-- Recent files detection
-- File timestamp retrieval
-- Error handling for non-git repositories
-"""
-
 import subprocess
 from unittest.mock import Mock, patch
 
@@ -154,13 +143,14 @@ class TestGetRecentGitFiles:
         with patch("subprocess.run") as mock_run:
             # Mock git log to return duplicate file entries
             mock_run.return_value = Mock(
-                stdout="file1.py\nfile2.py\nfile1.py\nfile3.py\n",
-                returncode=0
+                stdout="file1.py\nfile2.py\nfile1.py\nfile3.py\n", returncode=0
             )
 
             # Mock file existence
-            with patch("pathlib.Path.exists", return_value=True), \
-                 patch("pathlib.Path.is_file", return_value=True):
+            with (
+                patch("pathlib.Path.exists", return_value=True),
+                patch("pathlib.Path.is_file", return_value=True),
+            ):
                 result = get_recent_git_files(sample_git_repo)
 
                 # Should have unique files only
@@ -210,8 +200,7 @@ class TestGetFileGitTimestamp:
         with patch("subprocess.run") as mock_run:
             # Mock git log output with timestamp
             mock_run.return_value = Mock(
-                stdout="2024-01-15 14:30:22 -0500",
-                returncode=0
+                stdout="2024-01-15 14:30:22 -0500", returncode=0
             )
             result = get_file_git_timestamp(test_file, sample_git_repo)
             assert result == "2024-01-15 14:30:22"

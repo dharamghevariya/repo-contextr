@@ -1,12 +1,3 @@
-"""
-Unit tests for the CLI module.
-
-Tests cover:
-- Version display
-- Basic CLI functionality
-- Error handling
-"""
-
 from unittest.mock import Mock, patch
 
 from typer.testing import CliRunner
@@ -138,12 +129,14 @@ class TestCLI:
         mock_config.return_value = mock_config_obj
 
         with patch("contextr.cli.package_repository", return_value="test"):
-            self.runner.invoke(app, [".", "--include", "*.py", "--recent", "-o", "output.txt"])
+            self.runner.invoke(
+                app, [".", "--include", "*.py", "--recent", "-o", "output.txt"]
+            )
 
             # Verify get_effective_config was called with correct arguments
             mock_config.assert_called_once_with(
                 cli_paths=["."],
                 cli_include="*.py",
                 cli_output="output.txt",
-                cli_recent=True
+                cli_recent=True,
             )

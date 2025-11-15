@@ -1,13 +1,3 @@
-"""
-Unit tests for the file discovery module.
-
-Tests cover:
-- File and directory discovery
-- Pattern matching for file inclusion
-- Path skipping logic
-- Permission error handling
-"""
-
 from unittest.mock import patch
 
 from contextr.discovery.file_discovery import (
