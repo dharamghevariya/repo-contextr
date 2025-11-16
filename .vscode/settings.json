@@ -46,5 +46,7 @@
     "**/dist/**": true,
     "**/build/**": true,
     "**/*.egg-info/**": true
-  }
+  },
+  "python-envs.defaultEnvManager": "ms-python.python:venv",
+  "python-envs.pythonProjects": []
 }
