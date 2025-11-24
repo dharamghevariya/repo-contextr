@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "repo-contextr"
-version = "1.0.0"
+version = "1.0.1"
 description = "A powerful Repository Context Packager CLI tool for LLMs"
 readme = "README.md"
 license = {file = "LICENSE"}
